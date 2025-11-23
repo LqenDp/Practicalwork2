@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет - DesignPro</title>
+</head>
+<body>
+    <div class="header">
+        <h1>Личный кабинет - {{ user.username }}</h1>
+    </div>
+
+    <div class="nav">
+        <a href="{% url 'index' %}">Главная</a>
+        <a href="{% url 'profile' %}">Личный кабинет</a>
+        <form method="post" action="{% url 'logout' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-link" style="padding: 0; border: none; background: none; color: #11111;">
+                Выйти
+            </button>
+        </form>
+    </div>
+
+    <div class="profile-content">
+        <div class="user-info">
+            <h2>Информация о пользователе</h2>
+            <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Имя:</strong> {{ user.first_name }}</p>
+            <p><strong>Дата регистрации:</strong> {{ user.date_joined|date:"d.m.Y" }}</p>
+        </div>
+
+        <h2>Добро пожаловать в личный кабинет!</h2>
+    </div>
+</body>
+</html>
