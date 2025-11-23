@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная страница - DesignPro</title>
+</head>
+<body>
+    <div class="header">
+        <h1>DesignPro - Студия дизайна интерьеров</h1>
+        <p>Платформа для создания и оформления интерьеров жилых помещений</p>
+    </div>
+
+    <div class="nav">
+        <a href="{% url 'index' %}">Главная</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'profile' %}">Личный кабинет</a>
+                <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-link" style="padding: 0; border: none; background: none; color: #FFFFFF;">
+                        Выйти
+                    </button>
+                </form>
+        {% else %}
+            <a href="{% url 'login' %}">Войти</a>
+            <a href="{% url 'register' %}">Регистрация</a>
+        {% endif %}
+    </div>
+
+    <div class="welcome-section">
+        <h2>Добро пожаловать в DesignPro!</h2>
+        <p>Мы создаем уникальные дизайны интерьеров для вашего комфорта.</p>
+    </div>
+</body>
+</html>

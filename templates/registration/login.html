@@ -1,0 +1,44 @@
+{% extends "base_generic.html" %}
+
+{% block title %}Вход в систему - Design.pro{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <h1>Вход в систему</h1>
+            <p>Войдите в свой аккаунт Design.pro</p>
+        </div>
+
+        <div class="login-body">
+            {% if form.errors %}
+            <div class="error-alert">
+                <strong>Ошибка!</strong> Неправильное имя пользователя или пароль.
+            </div>
+            {% endif %}
+
+            <form method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label class="form-label">Имя пользователя:</label>
+                    {{ form.username }}
+                    <p class="help-text">Введите ваш логин</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Пароль:</label>
+                    {{ form.password }}
+                    <p class="help-text">Введите ваш пароль</p>
+                </div>
+
+                <button type="submit" class="submit-btn full-width">
+                    Войти в систему
+                </button>
+
+                <input type="hidden" name="next" value="{{ next }}">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
