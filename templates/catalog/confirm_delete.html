@@ -1,0 +1,29 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="confirmation-box">
+        <h2>Подтверждение удаления</h2>
+
+        <div class="application-info">
+            <h3>Заявка: {{ application.title }}</h3>
+            <p><strong>Дата создания:</strong> {{ application.created_at|date:"d.m.Y H:i" }}</p>
+            <p><strong>Категория:</strong> {{ application.category.name }}</p>
+            <p><strong>Статус:</strong> {{ application.get_status_display }}</p>
+        </div>
+
+        <div class="warning">
+            <p>Вы уверены, что хотите удалить эту заявку? Это действие нельзя отменить.</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-actions">
+                <button type="submit" class="btn btn-danger">Да, удалить</button>
+                <a href="{% url 'my_applications' %}" class="btn btn-secondary">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

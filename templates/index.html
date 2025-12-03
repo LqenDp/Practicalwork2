@@ -70,5 +70,34 @@
         <h2>Добро пожаловать в DesignPro!</h2>
         <p>Мы создаем уникальные дизайны интерьеров для вашего комфорта.</p>
     </div>
+    <div class="statistics">
+    <div class="stat-card">
+        <h3>Заявок в работе:</h3>
+        <div class="stat-number">{{ in_progress_count }}</div>
+        <p>Текущие проекты</p>
+    </div>
+</div>
+
+{% if completed_applications %}
+<div class="completed-applications">
+    <h2>Последние выполненные работы</h2>
+    <div class="applications-grid">
+        {% for app in completed_applications %}
+        <div class="application-card">
+            {% if app.images.first %}
+            <div class="application-image">
+                <img src="{{ app.images.first.image.url }}" alt="{{ app.title }}">
+            </div>
+            {% endif %}
+            <div class="application-info">
+                <p class="date">{{ app.created_at|date:"d.m.Y" }}</p>
+                <h3>{{ app.title }}</h3>
+                <p class="category">{{ app.category.name }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
 </body>
 </html>
