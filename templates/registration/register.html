@@ -1,35 +1,6 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-<div class="form-container">
-    <h2>Регистрация</h2>
-
-    <form method="post">
-        {% csrf_token %}
-
-        {% for field in form %}
-        <div class="form-group">
-            <label class="form-label">{{ field.label }}</label>
-            {{ field }}
-            {% if field.errors %}
-            <div class="error-message">
-                {% for error in field.errors %}
-                    {{ error }}
-                {% endfor %}
-            </div>
-            {% endif %}
-            {% if field.help_text %}
-            <small class="help-text">{{ field.help_text }}</small>
-            {% endif %}
-        </div>
-        {% endfor %}
-
-        <button type="submit" class="submit-btn">Зарегистрироваться</button>
-    </form>
-
-    <p class="auth-link">Уже есть аккаунт? <a href="{% url 'login' %}">Войдите</a></p>
-</div>
-
 <style>
     .form-container {
         max-width: 500px;
@@ -104,4 +75,34 @@
         text-decoration: underline;
     }
 </style>
+<div class="form-container">
+    <h2>Регистрация</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="form-group">
+            <label class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+            <div class="error-message">
+                {% for error in field.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% if field.help_text %}
+            <small class="help-text">{{ field.help_text }}</small>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="submit-btn">Зарегистрироваться</button>
+    </form>
+
+    <p class="auth-link">Уже есть аккаунт? <a href="{% url 'login' %}">Войдите</a></p>
+</div>
+
+
 {% endblock %}

@@ -1,125 +1,259 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-<div class="container">
-    <div class="header">
-        <h1>Мои заявки</h1>
-        <a href="{% url 'create_application' %}" class="btn btn-primary">
-            Создать новую заявку
-        </a>
-    </div>
+<style>
+.applications-page {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
 
-    <div class="filters">
-        <h3>Фильтр по статусу:</h3>
-        <div class="filter-buttons">
-            <a href="{% url 'my_applications' %}"
-               class="btn {% if not status_filter %}btn-active{% else %}btn-secondary{% endif %}">
-                Все заявки
-            </a>
-            <a href="{% url 'my_applications' %}?status=new"
-               class="btn {% if status_filter == 'new' %}btn-active{% else %}btn-secondary{% endif %}">
-                Новые
-            </a>
-            <a href="{% url 'my_applications' %}?status=in_progress"
-               class="btn {% if status_filter == 'in_progress' %}btn-active{% else %}btn-secondary{% endif %}">
-                В работе
-            </a>
-            <a href="{% url 'my_applications' %}?status=completed"
-               class="btn {% if status_filter == 'completed' %}btn-active{% else %}btn-secondary{% endif %}">
-                Выполненные
-            </a>
-        </div>
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #eee;
+}
+
+.header-section h1 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 28px;
+}
+
+.create-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 15px;
+}
+.message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.content-wrapper {
+    display: flex;
+    gap: 25px;
+    align-items: flex-start;
+}
+
+.table-container {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+table {
+    width: 100%;
+
+    font-size: 14px;
+}
+
+table th {
+    background: #2c3e50;
+    color: white;
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 600;
+}
+
+table td {
+    padding: 12px 15px;
+}
+
+.status {
+    padding: 5px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.status.new {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.status.in_progress {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.status.completed {
+    background: #e8f5e9;
+    color: #388e3c;
+}
+
+.delete-btn {
+    background: #e74c3c;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.delete-btn:hover {
+    background: #c0392b;
+}
+.filter-panel {
+    width: 250px;
+}
+
+.filter-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.filter-card h3 {
+    margin: 0 0 15px;
+    color: #2c3e50;
+    font-size: 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3498db;
+}
+
+.filters {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    color: #2c3e50;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: 0.2s;
+}
+
+.filter:hover {
+    background: #f8f9fa;
+}
+
+.filter.active {
+    background: #e3f2fd;
+    color: #1976d2;
+    font-weight: 500;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #95a5a6;
+}
+
+.dot.blue {
+    background: #3498db;
+}
+
+.dot.orange {
+    background: #f39c12;
+}
+
+.dot.green {
+    background: #27ae60;
+}
+</style>
+<div class="applications-page">
+    <div class="header-section">
+        <h1>Мои заявки</h1>
+        <a href="{% url 'create_application' %}" class="create-btn">
+            Создать заявку
+        </a>
     </div>
 
     {% if messages %}
     <div class="messages">
         {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
-            {{ message }}
-        </div>
+        <div class="message {{ message.tags }}">{{ message }}</div>
         {% endfor %}
     </div>
     {% endif %}
 
-    {% if applications %}
-    <div class="applications-list">
-        <table class="applications-table">
-            <thead>
-                <tr>
-                    <th>Дата создания</th>
-                    <th>Название</th>
-                    <th>Описание</th>
-                    <th>Категория</th>
-                    <th>Статус</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for app in applications %}
-                <tr>
-                    <td>{{ app.created_at|date:"d.m.Y H:i" }}</td>
-                    <td>{{ app.title }}</td>
-                    <td>{{ app.description|truncatechars:100 }}</td>
-                    <td>{{ app.category.name }}</td>
-                    <td>
-                        <span class="status status-{{ app.status }}">
-                            {{ app.get_status_display }}
-                        </span>
-                    </td>
-                    <td class="actions">
-                        {% if app.can_be_deleted %}
-                        <a href="{% url 'delete_application' app.pk %}"
-                           class="btn btn-danger btn-sm"
-                           onclick="return confirm('Вы уверены, что хотите удалить эту заявку?')">
-                            Удалить
-                        </a>
-                        {% else %}
-                        <span class="text-muted">Удаление недоступно</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="content-wrapper">
+        <div class="table-container">
+            {% if applications %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Название</th>
+                        <th>Описание</th>
+                        <th>Категория</th>
+                        <th>Статус</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app in applications %}
+                    <tr>
+                        <td>{{ app.created_at|date:"d.m.Y H:i" }}</td>
+                        <td>{{ app.title }}</td>
+                        <td>{{ app.description|truncatechars:50 }}</td>
+                        <td>{{ app.category.name }}</td>
+                        <td>
+                            <span class="status {{ app.status }}">
+                                {{ app.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if app.can_be_deleted %}
+                            <a href="{% url 'delete_application' app.pk %}" class="delete-btn"
+                               onclick="return confirm('Удалить заявку?')">
+                                Удалить
+                            </a>
+                            {% else %}
+                            <span class="no-delete">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="no-applications">
+                <h3>Нет заявок</h3>
+                <p>Создайте первую заявку</p>
+                <a href="{% url 'create_application' %}" class="create-btn">Создать заявку</a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="filter-panel">
+            <div class="filter-card">
+                <h3>Фильтр по статусу</h3>
+                <div class="filters">
+                    <a href="{% url 'my_applications' %}" class="filter {% if not status_filter %}active{% endif %}">
+                        <span class="dot"></span> Все
+                    </a>
+                    <a href="{% url 'my_applications' %}?status=new" class="filter {% if status_filter == 'new' %}active{% endif %}">
+                        <span class="dot blue"></span> Новые
+                    </a>
+                    <a href="{% url 'my_applications' %}?status=in_progress" class="filter {% if status_filter == 'in_progress' %}active{% endif %}">
+                        <span class="dot orange"></span> В работе
+                    </a>
+                    <a href="{% url 'my_applications' %}?status=completed" class="filter {% if status_filter == 'completed' %}active{% endif %}">
+                        <span class="dot green"></span> Выполненные
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-    {% else %}
-    <div class="no-applications">
-        <p>У вас пока нет заявок.</p>
-        <a href="{% url 'create_application' %}" class="btn btn-primary">
-            Создать первую заявку
-        </a>
-    </div>
-    {% endif %}
 </div>
 
-<style>
-    .container {
-        margin: 0 auto;
-        padding: 20px;
-    }
 
-    .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 30px;
-    }
-
-    .filters {
-        margin-bottom: 30px;
-        background: #f8f9fa;
-        padding: 20px;
-        border-radius: 8px;
-    }
-
-    .btn {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 4px;
-        text-decoration: none;
-        display: inline-block;
-        cursor: pointer;
-        font-size: 14px;
-    }
-</style>
 {% endblock %}
