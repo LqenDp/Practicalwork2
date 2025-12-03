@@ -39,5 +39,16 @@ class Application(models.Model):
         return f"{self.title} - {self.user.username}"
 
     def can_be_deleted(self):
-        """Проверяет, можно ли удалить заявку"""
         return self.status in ['new']
+
+class ApplicationImage(models.Model):
+    application = models.ForeignKey(Application, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(
+        upload_to='applications/',
+        verbose_name='Фотография',
+        validators=[]
+    )
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Фото для {self.application.title}"
