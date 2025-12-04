@@ -11,7 +11,6 @@ class Category(models.Model):
         return self.name
 
     def delete(self, *args, **kwargs):
-        # При удалении категории удаляем все связанные заявки
         Application.objects.filter(category=self).delete()
         super().delete(*args, **kwargs)
 
@@ -48,7 +47,6 @@ class Application(models.Model):
         return self.status in ['new']
 
     def can_change_status(self):
-        """Проверяет, можно ли изменить статус заявки"""
         return self.status == 'new'
 
 

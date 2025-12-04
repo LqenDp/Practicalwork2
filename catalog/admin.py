@@ -50,8 +50,8 @@ class ApplicationAdmin(admin.ModelAdmin):
 
     def can_change_status_display(self, obj):
         if obj.can_change_status():
-            return "✅ Можно изменить статус"
-        return "❌ Нельзя изменить статус (уже в работе или выполнено)"
+            return " Можно изменить статус"
+        return " Нельзя изменить статус (уже в работе или выполнено)"
 
     can_change_status_display.short_description = 'Возможность изменения статуса'
 
