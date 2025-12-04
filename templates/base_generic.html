@@ -78,6 +78,10 @@
                 <li><a href="{% url 'index' %}">Главная</a></li>
                 {% if user.is_authenticated %}
                     <li class="user-info">Пользователь: {{ user.get_username }}</li>
+                    {% if user.is_staff %}
+                        <li><a href="{% url 'admin_application_list' %}">Администрирование заявок</a></li>
+                        <li><a href="/superadmin/">Админ-панель Django</a></li>
+                    {% endif %}
                     <li><a href="{% url 'profile' %}">Личный кабинет</a></li>
                     <li>
                         <form method="post" action="{% url 'logout' %}">

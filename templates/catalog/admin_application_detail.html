@@ -1,0 +1,92 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+<div class="admin-application-detail">
+    <div class="header-section">
+        <h1>Изменение статуса заявки</h1>
+        <a href="{% url 'admin_application_list' %}" class="btn btn-secondary">Назад к списку</a>
+    </div>
+
+    <div class="application-info-card">
+        <h2>Информация о заявке</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <strong>Пользователь:</strong> {{ application.user.username }}
+            </div>
+            <div class="info-item">
+                <strong>Текущий статус:</strong>
+                <span class="status-badge status-{{ application.status }}">
+                    {{ application.get_status_display }}
+                </span>
+            </div>
+            <div class="info-item full-width">
+                <strong>Название:</strong> {{ application.title }}
+            </div>
+            <div class="info-item full-width">
+                <strong>Описание:</strong> {{ application.description }}
+            </div>
+            <div class="info-item">
+                <strong>Категория:</strong> {{ application.category.name }}
+            </div>
+        </div>
+    </div>
+
+    <div class="status-change-form">
+        <h2>Изменение статуса</h2>
+
+        {% if not application.can_change_status %}
+        <div class="warning-alert">
+            <p>⚠️ Эта заявка уже находится в работе или выполнена. Изменение статуса невозможно.</p>
+        </div>
+        {% endif %}
+
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if application.can_change_status %}
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="id_status">{{ form.status.label }}</label>
+                {{ form.status }}
+                {% if form.status.errors %}
+                <div class="error">{{ form.status.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_comment">{{ form.comment.label }}</label>
+                {{ form.comment }}
+                <small>{{ form.comment.help_text }}</small>
+                {% if form.comment.errors %}
+                <div class="error">{{ form.comment.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_design_image">{{ form.design_image.label }}</label>
+                {{ form.design_image }}
+                <small>{{ form.design_image.help_text }}</small>
+                {% if form.design_image.errors %}
+                <div class="error">{{ form.design_image.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                <a href="{% url 'admin_application_list' %}" class="btn btn-secondary">Отмена</a>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+
+{% endblock %}

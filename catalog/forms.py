@@ -61,3 +61,104 @@ class ApplicationForm(forms.ModelForm):
                 raise ValidationError('Размер файла не должен превышать 2 МБ')
 
         return image
+
+
+    class AdminApplicationForm(forms.ModelForm):
+        comment = forms.CharField(
+            label='Комментарий администратора',
+            widget=forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
+            required=False,
+            help_text='Обязателен при смене статуса на "Принято в работу"'
+        )
+        design_image = forms.ImageField(
+            label='Изображение дизайна',
+            required=False,
+            help_text='Обязательно при смене статуса на "Выполнено". Формат: jpg, jpeg, png, bmp. Максимальный размер: 2МБ'
+        )
+
+        class Meta:
+            model = Application
+            fields = ['status', 'comment']
+            widgets = {
+                'status': forms.Select(attrs={'class': 'form-control'}),
+            }
+
+        def clean(self):
+            cleaned_data = super().clean()
+            status = cleaned_data.get('status')
+            comment = cleaned_data.get('comment')
+            design_image = self.files.get('design_image') if hasattr(self, 'files') else None
+
+            if status == 'in_progress' and not comment:
+                raise ValidationError('При смене статуса на "Принято в работу" необходим комментарий')
+
+            if status == 'completed' and not design_image:
+                raise ValidationError('При смене статуса на "Выполнено" необходимо прикрепить изображение дизайна')
+
+            return cleaned_data
+
+        def clean_design_image(self):
+            design_image = self.cleaned_data.get('design_image')
+            if design_image:
+
+                allowed_extensions = ['.jpg', '.jpeg', '.png', '.bmp']
+                ext = os.path.splitext(design_image.name)[1].lower()
+                if ext not in allowed_extensions:
+                    raise ValidationError(
+                        f'Недопустимый формат файла. Разрешенные форматы: {", ".join(allowed_extensions)}'
+                    )
+
+
+                if design_image.size > 2097152:
+                    raise ValidationError('Размер файла не должен превышать 2 МБ')
+
+            return design_image
+
+class AdminApplicationForm(forms.ModelForm):
+    comment = forms.CharField(
+        label='Комментарий администратора',
+        widget=forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
+        required=False,
+        help_text='Обязателен при смене статуса на "Принято в работу"'
+    )
+    design_image = forms.ImageField(
+        label='Изображение дизайна',
+        required=False,
+        help_text='Обязательно при смене статуса на "Выполнено". Формат: jpg, jpeg, png, bmp. Максимальный размер: 2МБ'
+    )
+
+    class Meta:
+        model = Application
+        fields = ['status', 'comment']
+        widgets = {
+            'status': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        status = cleaned_data.get('status')
+        comment = cleaned_data.get('comment')
+        design_image = self.files.get('design_image') if hasattr(self, 'files') else None
+
+        if status == 'in_progress' and not comment:
+            raise ValidationError('При смене статуса на "Принято в работу" необходим комментарий')
+
+        if status == 'completed' and not design_image:
+            raise ValidationError('При смене статуса на "Выполнено" необходимо прикрепить изображение дизайна')
+
+        return cleaned_data
+
+    def clean_design_image(self):
+        design_image = self.cleaned_data.get('design_image')
+        if design_image:
+
+            allowed_extensions = ['.jpg', '.jpeg', '.png', '.bmp']
+            ext = os.path.splitext(design_image.name)[1].lower()
+            if ext not in allowed_extensions:
+                raise ValidationError(
+                    f'Недопустимый формат файла. Разрешенные форматы: {", ".join(allowed_extensions)}'
+                )
+            if design_image.size > 2097152:
+                raise ValidationError('Размер файла не должен превышать 2 МБ')
+
+        return design_image
