@@ -8,4 +8,6 @@ urlpatterns = [
     path('create-application/', views.create_application, name='create_application'),
     path('my-applications/', views.my_applications, name='my_applications'),
     path('delete-application/<int:pk>/', views.delete_application, name='delete_application'),
+    path('admin/applications/', views.admin_application_list, name='admin_application_list'),
+    path('admin/applications/<int:pk>/', views.admin_application_detail, name='admin_application_detail'),
 ]
