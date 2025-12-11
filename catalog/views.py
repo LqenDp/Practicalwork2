@@ -9,13 +9,39 @@ from .forms import CustomUserCreationForm, ApplicationForm
 from .models import Application, Category, ApplicationImage
 from django.contrib.admin.views.decorators import staff_member_required
 from .forms import AdminApplicationForm
+from django.contrib.auth.models import User
+from django.contrib.auth import login, authenticate
+from django.views import View
+
+
+# Заменяем CreateView на обычный View
+class RegisterView(View):
+    template_name = 'registration/register.html'
+
+    def get(self, request):
+        form = CustomUserCreationForm()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            # Сохраняем пользователя
+            user = form.save()
+
+            messages.success(
+                request,
+                'Регистрация прошла успешно! Теперь вы можете войти в систему.'
+            )
+            return redirect('login')
+
+        messages.error(request, 'Пожалуйста, исправьте ошибки в форме.')
+        return render(request, self.template_name, {'form': form})
 
 
 def index(request):
     completed_applications = Application.objects.filter(
         status='completed'
     ).order_by('-created_at')[:4]
-
     in_progress_count = Application.objects.filter(status='in_progress').count()
 
     context = {
@@ -23,12 +49,6 @@ def index(request):
         'in_progress_count': in_progress_count,
     }
     return render(request, 'index.html', context)
-
-
-class RegisterView(CreateView):
-    form_class = CustomUserCreationForm
-    success_url = reverse_lazy('login')
-    template_name = 'registration/register.html'
 
 
 @login_required
@@ -42,7 +62,6 @@ def create_application(request):
         form = ApplicationForm(request.POST, request.FILES)
         if form.is_valid():
             try:
-
                 application = form.save(commit=False)
                 application.user = request.user
                 application.status = 'new'
@@ -68,8 +87,8 @@ def create_application(request):
 @login_required
 def my_applications(request):
     applications = Application.objects.filter(user=request.user)
-
     status_filter = request.GET.get('status')
+
     if status_filter:
         applications = applications.filter(status=status_filter)
 
@@ -102,8 +121,8 @@ def delete_application(request, pk):
 @staff_member_required
 def admin_application_list(request):
     applications = Application.objects.all()
-
     status_filter = request.GET.get('status')
+
     if status_filter:
         applications = applications.filter(status=status_filter)
 
@@ -129,7 +148,6 @@ def admin_application_detail(request, pk):
     if request.method == 'POST':
         form = AdminApplicationForm(request.POST, request.FILES)
         if form.is_valid():
-
             if not application.can_change_status():
                 messages.error(request, 'Нельзя изменить статус заявки, которая уже в работе или выполнена')
                 return redirect('admin_application_detail', pk=pk)

@@ -2,6 +2,19 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 import os
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+
+# Добавим сигнал для установки email при создании пользователя
+@receiver(post_save, sender=User)
+def save_user_email(sender, instance, created, **kwargs):
+    """
+    Гарантируем, что email сохранится при создании пользователя
+    """
+    if created and hasattr(instance, '_email_to_save'):
+        instance.email = instance._email_to_save
+        instance.save(update_fields=['email'])
 
 
 class Category(models.Model):
@@ -11,6 +24,7 @@ class Category(models.Model):
         return self.name
 
     def delete(self, *args, **kwargs):
+        # При удалении категории удаляем все связанные заявки
         Application.objects.filter(category=self).delete()
         super().delete(*args, **kwargs)
 
@@ -47,6 +61,7 @@ class Application(models.Model):
         return self.status in ['new']
 
     def can_change_status(self):
+        """Проверяет, можно ли изменить статус заявки"""
         return self.status == 'new'
 
 
